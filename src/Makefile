@@ -18,6 +18,9 @@ clean:
 s21_matrix.a: s21_matrix.o
 	ar -rcs s21_matrix.a *.o s21_matrix.h
 	ranlib s21_matrix.a
+lib_arm:
+	gcc -c -march=armv7-a -mfloat-abi=hard -mfpu=neon -o s21_matrix.o *.c
+	ar rcs s21_matrix.a s21_matrix.o
 
 s21_matrix.o: *.c
 	$(CC) -c *.c

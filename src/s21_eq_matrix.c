@@ -1,6 +1,4 @@
 #include "s21_matrix.h"
-
-
 int compareDoubles(double a, double b)
 {
     return fabs(a - b) < 0.0000001
