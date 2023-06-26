@@ -11,12 +11,12 @@ int s21_inverse_matrix(matrix_t *A, matrix_t *result) {
     matrix_t complTransp = s21_init_matrix();
     s21_transpose(&compl, &complTransp);
     s21_create_matrix(A->rows, A->columns, result);
-    for (int i = 0; i < A->columns; i++) {
-      for (int j = 0; j < A->rows; j++) {
+    for (int i = 0; i < A->rows; i++) {
+      for (int j = 0; j < A->columns; j++) {
         result->matrix[i][j] = complTransp.matrix[i][j] / determinant;
       }
     }
-    s21_remove_matrix(&compl );
+    s21_remove_matrix(&compl);
     s21_remove_matrix(&complTransp);
   } else {
     errorState = CALCULATION_ERROR;

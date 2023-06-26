@@ -19,26 +19,37 @@ double generate_value_in_range(double min, double max)
 
 void fill_matrix_range(matrix_t *matrix, double minvalue, double maxvalue)
 {
-  for (int j = 0; j < matrix->columns; j++)
+  for (int i = 0; i < matrix->rows; i++)
   {
-    for (int i = 0; i < matrix->rows; i++)
+    for (int j = 0; j < matrix->columns; j++)
     {
-      matrix->matrix[j][i] = generate_value_in_range(minvalue, maxvalue);
+      matrix->matrix[i][j] = generate_value_in_range(minvalue, maxvalue);
     }
   }
 }
 
 void fill_matrix_increment(matrix_t *matrix, int value)
 {
-  for (int j = 0; j < matrix->columns; j++)
+  for (int i = 0; i < matrix->rows; i++)
   {
-    for (int i = 0; i < matrix->rows; i++)
+    for (int j = 0; j < matrix->columns; j++)
     {
-      matrix->matrix[j][i] = value++;
+
+      matrix->matrix[i][j] = value++;
     }
   }
 }
-
+void fill_matrix_increment2(matrix_t *matrix, int value)
+{
+  for (int i = 0; i < matrix->rows; i++)
+  {
+    for (int j = 0; j < matrix->columns; j++)
+    {
+      // printf("value: %d\n", value);
+      matrix->matrix[i][j] = value++;
+    }
+  }
+}
 // TESTS
 
 // create
@@ -306,6 +317,7 @@ START_TEST(test_sum_matrix_2)
       if (i == j)
       {
         ck_assert_int_eq(s21_sum_matrix(&m1, &m2, &m_result), OK);
+        s21_remove_matrix(&m_result);
       }
       else
       {
@@ -315,7 +327,7 @@ START_TEST(test_sum_matrix_2)
 
       s21_remove_matrix(&m1);
       s21_remove_matrix(&m2);
-      s21_remove_matrix(&m_result);
+      
     }
   }
 }
@@ -507,6 +519,7 @@ START_TEST(test_sub_matrix_2)
       if (i == j)
       {
         ck_assert_int_eq(s21_sub_matrix(&m1, &m2, &m_result), OK);
+        s21_remove_matrix(&m_result);
       }
       else
       {
@@ -516,7 +529,7 @@ START_TEST(test_sub_matrix_2)
 
       s21_remove_matrix(&m1);
       s21_remove_matrix(&m2);
-      s21_remove_matrix(&m_result);
+      
     }
   }
 }
@@ -911,21 +924,34 @@ START_TEST(test_transpose_1)
 }
 END_TEST
 
+void print_matrix(matrix_t* m)
+{
+  for (int i = 0; i < m->rows; i++)
+  {
+    for (int j = 0; j < m->columns; j++)
+    {
+      printf("%f  ", m->matrix[i][j]);
+    }
+    printf("\n");
+  }
+}
 START_TEST(test_transpose_2)
 {
   matrix_t m1 = s21_init_matrix();
   matrix_t m_result = s21_init_matrix();
 
   s21_create_matrix(2, 3, &m1);
-  fill_matrix_increment(&m1, 1);
-
+  fill_matrix_increment2(&m1, 1);
+  // print_matrix(&m1);
   int result = s21_transpose(&m1, &m_result);
-  ck_assert_int_eq(m_result.matrix[0][0], 1);
-  ck_assert_int_eq(m_result.matrix[0][1], 3);
-  ck_assert_int_eq(m_result.matrix[0][2], 5);
-  ck_assert_int_eq(m_result.matrix[1][0], 2);
-  ck_assert_int_eq(m_result.matrix[1][1], 4);
-  ck_assert_int_eq(m_result.matrix[1][2], 6);
+  // print_matrix(&m1);
+  // print_matrix(&m_result);
+  ck_assert_int_eq((int)m_result.matrix[0][0], 1);
+  ck_assert_int_eq((int)m_result.matrix[0][1], 4);
+  ck_assert_int_eq((int)m_result.matrix[1][0], 2);
+  ck_assert_int_eq((int)m_result.matrix[1][1], 5);
+  ck_assert_int_eq((int)m_result.matrix[2][0], 3);
+  ck_assert_int_eq((int)m_result.matrix[2][1], 6);
   ck_assert_int_eq(result, OK);
 
   s21_remove_matrix(&m1);
@@ -1031,7 +1057,37 @@ START_TEST(test_transpose_7)
   s21_remove_matrix(&result_tmp);
 }
 END_TEST
+START_TEST(test_transpose_8)
+{
+  const int rows = rand() % 100 + 1;
+  const int cols = rand() % 100 + 1;
+  matrix_t m = {0};
+  s21_create_matrix(rows, cols, &m);
 
+  matrix_t check = {0};
+  s21_create_matrix(cols, rows, &check);
+
+  for (int i = 0; i < rows; i++)
+  {
+    for (int j = 0; j < cols; j++)
+    {
+      // double rand_val = (i + j - rand()) / 21;
+      double rand_val = 4.235;
+      m.matrix[i][j] = rand_val;
+      check.matrix[j][i] = rand_val;
+    }
+  }
+
+  matrix_t res = {0};
+
+  ck_assert_int_eq(s21_transpose(&m, &res), OK);
+  ck_assert_int_eq(s21_eq_matrix(&check, &res), SUCCESS);
+
+  s21_remove_matrix(&m);
+  s21_remove_matrix(&res);
+  s21_remove_matrix(&check);
+}
+END_TEST
 // calc complements
 
 START_TEST(test_calc_complements_1)
@@ -1415,10 +1471,11 @@ Suite *suite_transpose()
   tcase_add_test(tc_1, test_transpose_1);
   tcase_add_test(tc_2, test_transpose_2);
   tcase_add_test(tc_3, test_transpose_3);
-  // tcase_add_test(tc_3, test_transpose_4);
-  // tcase_add_test(tc_3, test_transpose_5);
+  tcase_add_test(tc_3, test_transpose_4);
+  tcase_add_test(tc_3, test_transpose_5);
   tcase_add_test(tc_3, test_transpose_6);
-  // tcase_add_test(tc_3, test_transpose_7);
+  tcase_add_test(tc_3, test_transpose_7);
+  tcase_add_test(tc_3, test_transpose_8);
 
   suite_add_tcase(s, tc_1);
   suite_add_tcase(s, tc_2);

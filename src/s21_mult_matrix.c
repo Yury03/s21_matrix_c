@@ -5,8 +5,8 @@ int s21_mult_matrix(matrix_t *A, matrix_t *B, matrix_t *result) {
     return INCORRECT_MATRIX;
   int resulting_code = OK;
   if (A->columns == B->rows) {
-    for (int i = 0; i < result->columns; i++) {
-      for (int j = 0; j < result->rows; j++) {
+    for (int i = 0; i < result->rows; i++) {
+      for (int j = 0; j < result->columns; j++) {
         result->matrix[i][j] = 0;
         for (int k = 0; k < A->columns; k++) {
           result->matrix[i][j] += (A->matrix[i][k] * B->matrix[k][j]);
