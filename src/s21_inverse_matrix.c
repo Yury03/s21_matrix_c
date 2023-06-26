@@ -16,7 +16,7 @@ int s21_inverse_matrix(matrix_t *A, matrix_t *result) {
         result->matrix[i][j] = complTransp.matrix[i][j] / determinant;
       }
     }
-    s21_remove_matrix(&compl);
+    s21_remove_matrix(&compl );
     s21_remove_matrix(&complTransp);
   } else {
     errorState = CALCULATION_ERROR;
